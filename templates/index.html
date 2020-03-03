@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Смотреть онлайн трансляции: Футбол, Бокс, ММА, Хоккей, Киберспорт{% endblock %}
+
+{% block categories %}
+  <ul class="nav flex-column">
+    {% for cat in categories %} 
+        <li class="nav-item"><a class="nav-link" href="/cat/{{cat.getSlug}}">{{ cat.getName }}</a></li>
+    {% endfor %}
+  </ul>
+{% endblock %}
+
+
+{% block content %}
+          <div class="row justify-content-center"><h1>Ближайшие онлайн трансляции</h1></div>
+          <div class="row">
+              {% for category, events in categories_events %} 
+                  <div class="col-md-6">
+                      <h2>{{ category }}</h2>
+                      <div class="table-responsive">
+                        <table class="table table-striped table-sm">
+                          <thead>
+                            <tr>
+                              <th>Имя</th>
+                              <th>Чемпионат</th>
+                              <th>Начало</th>
+                              <th></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                                {% for event in events %} 
+                                  <tr class="{{ event.getIsOnline == true ? 'table-danger' }}">
+                                      <td>
+                                          <img width="7%" onerror="this.style.display='none'" src="/upload/imgs/events/{{event.getCategory.getSlug}}/{{event.getCommandA}}.png" />
+                                          <a href="/{{ event.getSlug }}">{{ event.getName }}</a>
+                                           <img width="7%" onerror="this.style.display='none'" src="/upload/imgs/events/{{event.getCategory.getSlug}}/{{event.getCommandB}}.png" />
+                                      </td>                                     
+                                      <td>{{ event.getTournament.getName }}</td>
+                                      <td>{{ event.getStart | date("d.m") }} в {{ event.getStart | date("H:i")}}</td>
+                                      <!-- <td>{{ event.getIsOnline }}</td> -->
+                                      <td>
+                                        {% if event.getIsOnline %}
+                                            <i data-feather="radio"></i> 
+                                        {% endif %}
+                                      </td>
+                                  </tr>   
+                                {% endfor %}                  
+                          </tbody>
+                        </table>
+                      </div>
+                  </div>
+                  <hr>
+              {% endfor %}
+          </div>
+         
+{% endblock %}

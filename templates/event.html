@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Смотреть онлайн трансляцию {{event.getName}}{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+    <link rel="stylesheet" type="text/css" href="/templates/css/sportradar/theme.css"> 
+    <style>
+      
+        .widgets {
+            max-width: 620px;
+            width: 100%;
+        }
+        .sr-widget {
+            border: rgba(0,0,0,0.12) solid 1px;
+            margin-bottom: 24px;
+        }
+    </style> 
+
+     <script>
+            (function(a,b,c,d,e,f,g,h,i){a[e]||(i=a[e]=function(){(a[e].q=a[e].q||[]).push(arguments)},i.l=1*new Date,i.o=f,
+g=b.createElement(c),h=b.getElementsByTagName(c)[0],g.async=1,g.src=d,g.setAttribute("n",e),h.parentNode.insertBefore(g,h)
+)})(window,document,"script", "https://widgets.sir.sportradar.com/8d8cf870268894c4731bd1ee437b5894/widgetloader", "SIR", {
+    theme: false, // using custom theme
+    language: "ru"
+});
+
+
+
+    </script>
+
+
+{% endblock %}
+
+
+{% block categories %}
+  <ul class="nav flex-column">
+    {% for cat in categories %} 
+        <li class="nav-item"><a class="nav-link {{ cat.getSlug == event.getCategory.getSlug ? 'active' }}" href="/cat/{{cat.getSlug}}">{{ cat.getName }}</a></li>
+    {% endfor %}
+  </ul>
+{% endblock %}
+
+
+{% block content %}
+    <div class="row justify-content-center"><h1>Смотреть онлайн {{event.getName}}</h1></div>
+    
+    <div class="row">
+        <h2>Чемпионат: {{event.getTournament.getName}}</h2>
+    </div>
+    <div class="row justify-content-center">
+        {% if event.getIsOnline %}  
+            <i data-feather="radio"></i> 
+        {% endif %}
+    </div>
+    <div class="row justify-content-center">
+        <h4>
+            Начало: {{ event.getStart | date("d.m") }} в {{ event.getStart | date("H:i")}}       
+        </h4>
+    </div>
+    <div id="commands" class="row justify-content-center">
+        <h4><img onerror="this.style.display='none';document.getElementById('commands').style.display = 'none'" src="/upload/imgs/events/{{event.getCategory.getSlug}}/{{event.getCommandA}}.png" /> <b><span id="dash">{{ event.getScore ? event.getScore : '—'}}</span></b> <img onerror="this.style.display='none';document.getElementById('commands').style.display = 'none'" src="/upload/imgs/events/{{event.getCategory.getSlug}}/{{event.getCommandB}}.png" /></h4>
+    </div>
+    <div class="row justify-content-center">
+        
+            <div class="col-md-auto">
+                <h4>{{ event.getCommandA_RU}}</h4>
+            </div>
+            <div class="col-md-auto"></div>
+
+            <div class="col-md-auto">
+                <h4>{{ event.getCommandB_RU}}</h4>
+            </div>
+        </h4>
+
+    </div>
+
+    <br>
+    
+    <div class="row justify-content-center">
+        <div class="widgets">
+            <div class="sr-widget sr-widget-1"></div>
+        </div>
+    </div>
+
+
+    <div class="row">
+
+      {% if event.getBroadcasts %}
+          <h4>Ссылки на трансляцию:</h4>
+          <!-- <div class="col-md-12"> -->
+              <div class="table-responsive">
+                <table class="table table-striped table-sm"> <!-- table table-striped table-sm-->
+                  <tbody>
+                      {% for channel, broadcasts in event.getBroadcasts %} 
+                        <tr>
+                          <!-- channel == 'iframe' ? 'Web' : channel -->
+                          <td>
+                            {% if channel == 'iframe' %}
+                               Web
+                            {% elseif channel == 'alieztv' %}
+                               ATV
+                            {% else %}
+                               {{channel}}
+                            {% endif %}
+                          </td>
+                          {% for broadcast in broadcasts %} 
+                              
+                              <td><a target="_blank" href="/watch/{{ channel }}/{{ broadcast }}">{{ loop.index }}</a></td>
+                                 
+                          {% endfor %}  
+                        </tr>                
+                      {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+         <!--  </div> -->
+      {% endif %}
+      <hr>
+    </div>
+    <hr>
+    {% if related_events %}
+        <div class="row">
+            <h4>Похожие трансляции:</h4>
+        </div>
+
+        <div class="row">       
+            <div class="">
+                      <div class="table-responsive">
+                        <table class="table table-striped table-sm">
+                          <thead>
+                            <tr>
+                              <th>Имя</th>
+                              <th>Чемпионат</th>
+                              <th>Начало</th>
+                              <th></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                                {% for event in related_events %} 
+                                  <tr class="{{ event.getIsOnline == true ? 'table-danger' }}">
+                                      <td>
+                                          <img width="7%" onerror="this.style.display='none'" src="/upload/imgs/events/{{event.getCategory.getSlug}}/{{event.getCommandA}}.png" />
+                                          <a href="/{{ event.getSlug }}">{{ event.getName }}</a>
+                                          <img width="7%" onerror="this.style.display='none'" src="/upload/imgs/events/{{event.getCategory.getSlug}}/{{event.getCommandB}}.png" />
+                                      </td>
+                                      <td>{{ event.getTournament.getName }}</td>
+                                      <td>{{ event.getStart | date("d.m") }} в {{ event.getStart | date("H:i")}} </td>
+                                      <td>
+                                        {% if event.getIsOnline %}
+                                            <i data-feather="radio"></i> 
+                                        {% endif %}
+                                      </td>
+                                  </tr>   
+                                {% endfor %}                  
+                          </tbody>
+                        </table>
+                      </div>
+                </div>
+        </div>     
+    {% endif %}
+
+
+    <div class="row">
+        <!-- Put this div tag to the place, where the Comments block will be -->
+        <div id="vk_comments"></div>
+        <script type="text/javascript">
+        VK.Widgets.Comments("vk_comments", {limit: 20, attach: "*"});
+        </script>
+    </div>
+         
+{% endblock %}
+
+
